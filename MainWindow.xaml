@@ -1,0 +1,163 @@
+<Window x:Class="SeatForge.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SeatForge" Height="760" Width="1180" MinHeight="620" MinWidth="900"
+        Background="{StaticResource PageBrush}" Foreground="White"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="#151821" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="CaretBrush" Value="White" />
+            <Setter Property="BorderBrush" Value="#303545" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="12,9" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="#1B1E28" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="#454B60" />
+            <Setter Property="Padding" Value="10,7" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Background" Value="#1B1E28" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Padding" Value="10,6" />
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock Text="SeatForge" FontSize="34" FontWeight="SemiBold" />
+                <TextBlock Text="Lokaler Clean-Room-Prototyp für Geräte und Sitz-Zuordnungen"
+                           Foreground="{StaticResource MutedBrush}" FontSize="14" Margin="0,7,0,0" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Content="Aktualisieren" Click="RefreshButton_Click" />
+                <Button Content="Zuordnungen speichern" Click="SaveButton_Click" />
+            </StackPanel>
+        </Grid>
+
+        <UniformGrid Grid.Row="1" Columns="3" Margin="0,24,0,18">
+            <Border Background="{StaticResource PanelBrush}" BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="1" CornerRadius="10" Padding="18" Margin="0,0,12,0">
+                <StackPanel>
+                    <TextBlock Text="Geräte (sichtbar / gesamt)" Foreground="{StaticResource MutedBrush}" />
+                    <TextBlock x:Name="DeviceCountText" Text="–" FontSize="28" Margin="0,6,0,0" />
+                </StackPanel>
+            </Border>
+            <Border Background="{StaticResource PanelBrush}" BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="1" CornerRadius="10" Padding="18" Margin="6,0">
+                <StackPanel>
+                    <TextBlock Text="Sitz 1" Foreground="{StaticResource MutedBrush}" />
+                    <TextBlock x:Name="SeatOneCountText" Text="–" FontSize="28" Margin="0,6,0,0" />
+                </StackPanel>
+            </Border>
+            <Border Background="{StaticResource PanelBrush}" BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="1" CornerRadius="10" Padding="18" Margin="12,0,0,0">
+                <StackPanel>
+                    <TextBlock Text="Sitz 2" Foreground="{StaticResource MutedBrush}" />
+                    <TextBlock x:Name="SeatTwoCountText" Text="–" FontSize="28" Margin="0,6,0,0" />
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <Border Grid.Row="2" Background="{StaticResource PanelBrush}" BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="1" CornerRadius="10" Padding="14,12" Margin="0,0,0,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0" VerticalAlignment="Center">
+                    <TextBox x:Name="SearchBox" TextChanged="SearchBox_TextChanged"
+                             ToolTip="Durchsucht Gerät, Kategorie und Hersteller" />
+                    <TextBlock Text="Gerät, Kategorie oder Hersteller suchen …"
+                               Foreground="{StaticResource MutedBrush}" Margin="14,0,0,0"
+                               VerticalAlignment="Center" IsHitTestVisible="False">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+
+                <TextBlock Grid.Column="1" Text="Sitzfilter" Foreground="{StaticResource MutedBrush}"
+                           VerticalAlignment="Center" Margin="18,0,10,0" />
+                <ComboBox x:Name="SeatFilterBox" Grid.Column="2" Width="180"
+                          ItemsSource="{Binding SeatFilters}"
+                          SelectionChanged="SeatFilter_Changed" />
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="3" Background="{StaticResource PanelBrush}" BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="1" CornerRadius="10" Padding="1">
+            <DataGrid x:Name="DevicesGrid" ItemsSource="{Binding DeviceView}" AutoGenerateColumns="False"
+                      CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="False"
+                      HeadersVisibility="Column" GridLinesVisibility="Horizontal"
+                      Background="Transparent" Foreground="White" RowBackground="#1B1E28"
+                      AlternatingRowBackground="#202430" BorderThickness="0"
+                      HorizontalGridLinesBrush="#303545" SelectionUnit="FullRow"
+                      SelectionMode="Single" RowHeight="44" ColumnHeaderHeight="42">
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#252936" />
+                        <Setter Property="Foreground" Value="#DDE1EC" />
+                        <Setter Property="BorderBrush" Value="#303545" />
+                        <Setter Property="Padding" Value="12,0" />
+                    </Style>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="Padding" Value="12,0" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                    </Style>
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Gerät" Binding="{Binding Name}" Width="2.2*" IsReadOnly="True" />
+                    <DataGridTextColumn Header="Kategorie" Binding="{Binding Category}" Width="1.1*" IsReadOnly="True" />
+                    <DataGridTextColumn Header="Hersteller" Binding="{Binding Manufacturer}" Width="1.2*" IsReadOnly="True" />
+                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="0.8*" IsReadOnly="True" />
+                    <DataGridTemplateColumn Header="Zuordnung" Width="1.1*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ComboBox ItemsSource="{Binding DataContext.SeatOptions, RelativeSource={RelativeSource AncestorType=Window}}"
+                                          SelectedItem="{Binding AssignedSeat, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          Background="#2B3040" Foreground="White" BorderBrush="#454B60"
+                                          SelectionChanged="SeatSelection_Changed" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <Grid Grid.Row="4" Margin="0,14,0,0">
+            <TextBlock x:Name="StatusText" Text="Bereit" Foreground="{StaticResource MutedBrush}" />
+            <TextBlock HorizontalAlignment="Right" Foreground="{StaticResource MutedBrush}"
+                       Text="Phase 1: nur lesen und lokal speichern – keine Windows-Systemänderungen" />
+        </Grid>
+    </Grid>
+</Window>

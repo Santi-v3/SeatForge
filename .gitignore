@@ -1,0 +1,10 @@
+bin/
+obj/
+.vs/
+.tools/
+.agent-benchmarks/
+.agent-runs/
+.freebuff/
+publish/
+*.user
+*.suo
