@@ -1,53 +1,36 @@
 # SeatForge
 
-SeatForge ist ein eigenständiger Clean-Room-Prototyp für eine lokale Multi-Seat-Verwaltung unter Windows.
+A Windows desktop prototype for listing connected devices and recording a local assignment to Seat 1, Seat 2 or Unassigned.
 
-## Aktueller Umfang
+## Problem and scope
 
-- Liest relevante Eingabe-, Anzeige-, Kamera- und Audiogeräte über WMI.
-- Ordnet Geräte in der Oberfläche „Seat 1“, „Seat 2“ oder „Unassigned“ zu.
-- Filtert Geräte live nach Name, Kategorie, Hersteller und Sitz.
-- Speichert ausschließlich die Zuordnung lokal unter `%LOCALAPPDATA%\SeatForge\assignments.json`.
-- Installiert keine Treiber und verändert weder Anmeldung noch Registry oder Windows-Sitzungen.
+A multi-seat setup needs an inventory of displays, input devices, cameras and audio devices before any seat-specific system integration can be explored. SeatForge provides a WPF interface backed by WMI and stores chosen assignments in `%LOCALAPPDATA%\SeatForge\assignments.json`. It filters the inventory by device attributes and seat.
 
-## Starten
+The current application **does not** install drivers, change the Windows registry, create user sessions or isolate devices between seats. It is an inventory and assignment prototype.
 
-```powershell
-.\Run.ps1
-```
+## Architecture
 
-Das Projekt enthaelt lokal eine portable .NET-8-SDK-Kopie unter `.tools/`, die
-nicht zu GitHub hochgeladen wird. Alternativ funktioniert auch `dotnet run`,
-wenn .NET 8 systemweit installiert ist.
+- `Services/DeviceInventoryService.cs`: WMI device enumeration.
+- `Models/DeviceRecord.cs`: device representation.
+- `Services/SeatAssignmentStore.cs`: local persistence.
+- `MainWindow.xaml` and `MainWindow.xaml.cs`: WPF user interface.
+- `Build.ps1` and `Run.ps1`: build and launch helpers.
 
-## Bauen und pruefen
+## Run and build
+
+Requires Windows, PowerShell and .NET 8 SDK. The project uses `System.Management` 8.0.0.
 
 ```powershell
-.\Build.ps1
+./Run.ps1
+./Build.ps1
 ```
 
-## Geplante Phasen
+Alternatively, use `dotnet run` from the repository root with a system-installed .NET 8 SDK. The portable SDK mentioned in older project notes is local and is not included in GitHub.
 
-1. Geräteinventar und lokale Sitz-Zuordnung.
-2. Robuste Geräte-IDs, Vorlagen sowie Import/Export.
-3. Separater, nicht privilegierter Hintergrunddienst für Geräteereignisse.
-4. Erst nach technischer und rechtlicher Prüfung: experimentelle Windows-Sitzungs- und Treiberarbeit in einer VM.
+## Status and verification
 
-Hydra-Code, Markenmaterial und Lizenzmechanismen werden nicht übernommen.
+Early clean-room prototype. The repository contains no automated tests or CI. Build and hardware behavior could not be verified in this non-Windows environment. Planned improvements include stronger device identifiers and import/export; driver and session work would require separate technical and legal review.
 
-## Kostenlose Coding-Agenten
+## License and author
 
-Die Projektdatei `opencode.json` bindet die anonyme Gratis-Route von Kilo Code in OpenCode ein. Verfügbare Beispiele:
-
-```powershell
-opencode run --model kilo-code/kilo-auto/free "Beschreibe deine Aufgabe"
-opencode run --model opencode/glm-5.3-flash-free "Beschreibe deine Aufgabe"
-freebuff
-```
-
-Die Anbieter und Gratis-Modelle wechseln. Als aktuelle Quelle dient
-[`awesome-free-ai-coding`](https://github.com/mvalentsev/awesome-free-ai-coding), das seine Einträge automatisiert prüft.
-FreeBuff, Kilo und manche kostenlose OpenCode-Modelle dürfen übermittelten Code speichern oder zum Modelltraining verwenden.
-
-Fuer projektuebergreifende Aufgaben kann der separate
-`Santi KI Router` Claude, Codex und kostenlose Worker nach Schwierigkeit einsetzen.
+MIT; see [LICENSE](LICENSE). Created by **Santino Burkhardt** as a personal Windows systems prototype, independent of his employer. It does not include Hydra source code or brand assets.
